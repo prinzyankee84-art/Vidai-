@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VIDAI – AI Video Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080808;font-family:'DM Sans',sans-serif;color:#f5f5f0;min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333}
+.app{min-height:100vh;background:#080808;position:relative;overflow-x:hidden}
+.wrap{max-width:460px;margin:0 auto;padding:20px 16px 40px;position:relative;z-index:1}
+.hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-top:8px}
+.hd-logo-wrap{display:flex;align-items:center;gap:10px}
+.hd-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#c8960a,#f5c518);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px #f5c51844;flex-shrink:0}
+.hd-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,#f5c518,#c8960a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.hd-tag{font-size:9px;color:#444;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.hd-badge{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:5px 12px;font-size:10px;color:#555;letter-spacing:1px}
+.made-by{text-align:center;font-size:10px;color:#2a2a2a;letter-spacing:2px;text-transform:uppercase;padding:20px 0 8px}
+.made-by span{color:#f5c51840}
+.card{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:20px;padding:24px;margin-bottom:16px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#e8ff4720;border:1px solid #e8ff4740;border-radius:20px;padding:5px 12px;font-size:10px;color:#e8ff47;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px}
+.pill::before{content:'';width:6px;height:6px;background:#e8ff47;border-radius:50%;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.pay-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:1.1;margin-bottom:10px}
+.pay-title em{color:#e8ff47;font-style:normal}
+.pay-desc{font-size:12px;color:#666;line-height:1.7;margin-bottom:22px}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}
+.feat{background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:12px;font-size:11px;color:#888;line-height:1.4}
+.feat strong{display:block;color:#ccc;font-size:12px;margin-bottom:2px}
+.price-block{background:#141414;border:1px solid #1e1e1e;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.price-lbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.price-val{font-family:'Bebas Neue',sans-serif;font-size:34px;color:#e8ff47;letter-spacing:1px}
+.price-note{font-size:10px;color:#444}
+.price-once{background:#e8ff4715;border:1px solid #e8ff4730;border-radius:6px;padding:4px 10px;font-size:10px;color:#e8ff47;letter-spacing:1px}
+.airtel-card{background:#0d1200;border:1px solid #2a3300;border-radius:12px;padding:16px;margin-bottom:16px;text-align:center}
+.airtel-lbl{font-size:9px;color:#667;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.airtel-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#aaff00;letter-spacing:4px}
+.airtel-name{font-size:10px;color:#889;margin-top:4px}
+.how-title{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.how-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
+.how-n{width:20px;height:20px;border-radius:50%;background:#e8ff47;color:#080808;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.how-t{font-size:11px;color:#777;line-height:1.5}
+.how-t b{color:#aaa}
+.inp{width:100%;background:#141414;border:1px solid #222;border-radius:10px;padding:13px 15px;font-family:'DM Sans',sans-serif;font-size:13px;color:#f5f5f0;outline:none;transition:border-color .2s;margin-bottom:10px}
+.inp:focus{border-color:#e8ff47}
+.inp::placeholder{color:#333}
+.btn{width:100%;border:none;border-radius:12px;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-y{background:#e8ff47;color:#080808}
+.btn-y:hover{background:#f5ff80}
+.btn-y:disabled{background:#222;color:#444;cursor:not-allowed}
+.btn-ghost{background:#141414;border:1px solid #222;color:#888;font-size:14px;letter-spacing:1px}
+.btn-ghost:hover{border-color:#e8ff47;color:#e8ff47}
+.err{background:#1a0808;border:1px solid #3a1010;border-radius:8px;padding:11px 14px;font-size:11px;color:#ff6b6b;margin-bottom:10px}
+.foot-note{font-size:10px;color:#333;text-align:center;margin-top:10px;line-height:1.6}
+.sect-lbl{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.prompt-inp{width:100%;background:#0f0f0f;border:1px solid #1e1e1e;border-radius:12px;padding:14px 15px;font-family:'DM Sans',sans-serif;font-size:13px;color:#f5f5f0;outline:none;resize:none;min-height:80px;transition:border-color .2s;margin-bottom:10px}
+.prompt-inp:focus{border-color:#e8ff47}
+.prompt-inp::placeholder{color:#2a2a2a}
+.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sel{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:#aaa;outline:none;width:100%;cursor:pointer}
+.player{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:16px;overflow:hidden;margin-bottom:14px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.scene-stage{width:100%;aspect-ratio:9/16;position:relative;overflow:hidden;background:#000}
+.scene-bg{position:absolute;inset:0;transition:background .6s}
+.scene-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.1) 60%)}
+.scene-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.scene-num{position:absolute;top:14px;right:14px;font-size:9px;color:#ffffff66;letter-spacing:2px}
+.scene-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;color:#fff;line-height:1.1;margin-bottom:8px;animation:slideUp .5s ease}
+.scene-text{font-size:13px;color:#ccc;line-height:1.6;animation:slideUp .5s ease .1s both}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.scene-accent{position:absolute;top:0;left:0;width:4px;height:100%}
+.progress-bar{height:3px;background:#1a1a1a}
+.progress-fill{height:100%;background:#e8ff47;transition:width .3s linear}
+.controls{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.ctrl-btn{background:none;border:none;color:#888;cursor:pointer;font-size:18px;padding:4px 8px;transition:color .2s;border-radius:6px}
+.ctrl-btn:hover{color:#e8ff47}
+.scene-dots{display:flex;gap:5px}
+.dot{width:5px;height:5px;border-radius:50%;background:#222;transition:all .2s;cursor:pointer}
+.dot.on{width:14px;border-radius:3px}
+.script-panel{padding:0 16px 16px}
+.script-item{padding:10px 0;border-bottom:1px solid #141414;display:flex;gap:10px;align-items:flex-start}
+.script-n{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#e8ff4766;flex-shrink:0;width:20px}
+.script-body{font-size:11px;color:#666;line-height:1.5}
+.script-body b{display:block;color:#aaa;font-size:12px;margin-bottom:2px}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 16px}
+.loading-stage{width:100%;aspect-ratio:9/16;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;border-radius:12;border:1px solid #1e1e1e}
+.load-ring{width:48px;height:48px;border:3px solid #1a1a1a;border-top-color:#e8ff47;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:11px;color:#444;letter-spacing:2px;text-transform:uppercase}
+.load-step{font-size:10px;color:#333;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const AIRTEL_NUMBER = "0753 864663";
+const APP_NAME = "VIDAI";
+const TRIAL_KEY = "vidai_trial_start";
+const PAID_KEY  = "vidai_paid";
+const API_KEY_S = "vidai_api_key";
+const TRIAL_MS  = 2 * 24 * 60 * 60 * 1000;
+
+function ApiKeyScreen({ onSave }) {
+  const [key, setKey] = React.useState("");
+  const [err, setErr] = React.useState("");
+  const save = () => {
+    if (!key.trim().startsWith("sk-ant-")) { setErr("Key must start with sk-ant-... Check and try again."); return; }
+    localStorage.setItem(API_KEY_S, key.trim());
+    onSave(key.trim());
+  };
+  return (
+    React.createElement("div", {className:"card"},
+      React.createElement("div", {className:"pill"}, "One Time Setup"),
+      React.createElement("div", {className:"pay-title"}, "Enter Your API Key"),
+      React.createElement("p", {className:"pay-desc"}, "VIDAI uses Claude AI. You need a free API key from Anthropic to generate videos."),
+      err && React.createElement("div", {className:"err"}, err),
+      React.createElement("input", {className:"inp", placeholder:"sk-ant-api03-...", value:key, onChange:e=>setKey(e.target.value)}),
+      React.createElement("button", {className:"btn btn-y", onClick:save}, "SAVE & CONTINUE 2192"),
+      React.createElement("p", {className:"foot-note", dangerouslySetInnerHTML:{__html:"Tap <a href='https://console.anthropic.com' target='_blank' style='color:#e8ff47;text-decoration:underline'>console.anthropic.com</a> to get your free key."}})
+    )
+  );
+}
+
+function getAccess() {
+  if (localStorage.getItem(PAID_KEY) === "true") return { status: "paid" };
+  let start = localStorage.getItem(TRIAL_KEY);
+  if (!start) { start = Date.now().toString(); localStorage.setItem(TRIAL_KEY, start); }
+  const elapsed = Date.now() - parseInt(start, 10);
+  if (elapsed < TRIAL_MS) {
+    const msLeft = TRIAL_MS - elapsed;
+    const hLeft  = Math.ceil(msLeft / 3600000);
+    return { status: "trial", hoursLeft: hLeft };
+  }
+  return { status: "expired" };
+}
+
+const accentFor = t => ({motivational:"#e8ff47",educational:"#47c8ff",news:"#ff4747",funny:"#ff9f47",story:"#c847ff"}[t]||"#e8ff47");
+const bgFor = (t,i) => {
+  const p = {motivational:["#0d1f0d","#1a0d2e","#1f1200","#0d1a1f","#1f0d0d"],educational:["#0a0f1a","#0f1a0a","#1a0f0a","#0a1a18","#150a1f"],news:["#0a0a12","#12080a","#080a0f","#0a120a","#120a08"],funny:["#1a0d00","#001a0d","#1a001a","#001a1a","#1a1a00"],story:["#100a1a","#0a1a10","#1a100a","#0a0f1a","#1a0a10"]};
+  return (p[t]||p.motivational)[i%(p[t]||p.motivational).length];
+};
+
+function Logo() {
+  return (
+    <div className="hd-logo-wrap">
+      <div className="hd-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <path d="M10 10L12 6L14 10L18 10.5L15 13.5L16 18L12 15.5L8 18L9 13.5L6 10.5Z" fill="#0a0a0a"/>
+          <path d="M12 2L14.5 7H20L15.5 10.5L17 16L12 13L7 16L8.5 10.5L4 7H9.5Z" fill="#c8960a"/>
+        </svg>
+      </div>
+      <div>
+        <div className="hd-logo">{APP_NAME}</div>
+        <div className="hd-tag">AI Video Generator · Uganda</div>
+      </div>
+    </div>
+  );
+}
+
+function PayScreen({ onUnlock }) {
+  const [txId, setTxId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const verify = async () => {
+    if (!txId.trim()) { setErr("Enter your Airtel Money transaction ID."); return; }
+    setBusy(true); setErr("");
+    await new Promise(r => setTimeout(r, 1500));
+    setBusy(false);
+    if (txId.trim().length >= 6) onUnlock();
+    else setErr("Transaction ID too short. Please check again.");
+  };
+
+  return (
+    <div className="card">
+      <div className="pill">Lifetime Access</div>
+      <div className="pay-title">Generate <em>Short Videos</em> with AI</div>
+      <p className="pay-desc">Type any idea and AI turns it into a short video with scenes and narration — perfect for TikTok, WhatsApp & YouTube Shorts.</p>
+      <div className="feat-grid">
+        <div className="feat"><strong>AI Scriptwriter</strong>Auto-generates scenes & narration</div>
+        <div className="feat"><strong>9:16 Format</strong>Ready for TikTok & Reels</div>
+        <div className="feat"><strong>5 Video Styles</strong>News, Story, Motivational…</div>
+        <div className="feat"><strong>Unlimited Videos</strong>No daily limits ever</div>
+      </div>
+      <div className="price-block">
+        <div>
+          <div className="price-lbl">One-time payment</div>
+          <div className="price-val">UGX 5,000</div>
+          <div className="price-note">Lifetime · No subscription</div>
+        </div>
+        <div className="price-once">PAY ONCE</div>
+      </div>
+      <div className="airtel-card">
+        <div className="airtel-lbl">Send Airtel Money to</div>
+        <div className="airtel-num">{AIRTEL_NUMBER}</div>
+        <div className="airtel-name">Nsereko Isaac · UGX 5,000</div>
+      </div>
+      <div className="how-title">How to pay</div>
+      {["Dial *185# on your Airtel line","Select Send Money and enter the number above","Send exactly UGX 5,000 and save your transaction ID","Enter the transaction ID below and tap Unlock"].map((t,i)=>(
+        <div className="how-step" key={i}>
+          <div className="how-n">{i+1}</div>
+          <div className="how-t">{t}</div>
+        </div>
+      ))}
+      {err && <div className="err" style={{marginTop:14}}>{err}</div>}
+      <input className="inp" style={{marginTop:16}} placeholder="Airtel Money transaction ID e.g. MP2412345678" value={txId} onChange={e=>setTxId(e.target.value)}/>
+      <button className="btn btn-y" onClick={verify} disabled={busy}>{busy?"Verifying…":"UNLOCK APP →"}</button>
+      <p className="foot-note">Access granted after valid transaction ID.<br/>For help: {AIRTEL_NUMBER}</p>
+    </div>
+  );
+}
+
+function VideoPlayer({ scenes, theme, onReset }) {
+  const [idx, setIdx] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [showScript, setShowScript] = useState(false);
+  const timerRef = useRef(null);
+  const accent = accentFor(theme);
+  const DURATION = 4000;
+
+  useEffect(() => {
+    if (!playing) return;
+    const start = Date.now();
+    timerRef.current = setInterval(() => {
+      const p = Math.min(((Date.now()-start)/DURATION)*100,100);
+      setProgress(p);
+      if (p>=100) { setIdx(i=>(i+1)%scenes.length); setProgress(0); }
+    },50);
+    return ()=>clearInterval(timerRef.current);
+  },[playing,idx,scenes.length]);
+
+  const scene = scenes[idx];
+
+  const download = () => {
+    const text = scenes.map((s,i)=>`Scene ${i+1}: ${s.title}\n${s.narration}`).join("\n\n");
+    const blob = new Blob([text],{type:"text/plain"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="video-script.txt"; a.click();
+  };
+
+  return (
+    <div className="player">
+      <div className="scene-stage">
+        <div className="scene-bg" style={{background:`radial-gradient(ellipse at 70% 30%, ${accent}22, ${bgFor(theme,idx)} 70%)`}}/>
+        <div className="scene-overlay"/>
+        <div className="scene-accent" style={{background:accent}}/>
+        <div className="scene-content">
+          <div className="scene-num">SCENE {idx+1}/{scenes.length}</div>
+          <div className="scene-title" key={"t"+idx}>{scene.title}</div>
+          <div className="scene-text" key={"n"+idx}>{scene.narration}</div>
+        </div>
+      </div>
+      <div className="progress-bar"><div className="progress-fill" style={{width:`${progress}%`,background:accent}}/></div>
+      <div className="controls">
+        <button className="ctrl-btn" onClick={()=>{setIdx(i=>(i-1+scenes.length)%scenes.length);setProgress(0);}}>◀</button>
+        <button className="ctrl-btn" onClick={()=>setPlaying(p=>!p)}>{playing?"⏸":"▶"}</button>
+        <div className="scene-dots">{scenes.map((_,i)=><div key={i} className={`dot${i===idx?" on":""}`} style={i===idx?{background:accent}:{}} onClick={()=>{setIdx(i);setProgress(0);}}/>)}</div>
+        <button className="ctrl-btn" onClick={()=>{setIdx(i=>(i+1)%scenes.length);setProgress(0);}}>▶</button>
+        <button className="ctrl-btn" onClick={()=>setShowScript(s=>!s)}>☰</button>
+      </div>
+      {showScript && (
+        <div className="script-panel">
+          {scenes.map((s,i)=>(
+            <div className="script-item" key={i}>
+              <div className="script-n">{i+1}</div>
+              <div className="script-body"><b>{s.title}</b>{s.narration}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="action-row">
+        <button className="btn btn-ghost" onClick={download}>↓ SCRIPT</button>
+        <button className="btn btn-ghost" onClick={onReset}>+ NEW VIDEO</button>
+      </div>
+    </div>
+  );
+}
+
+function VideoApp() {
+  const [prompt, setPrompt] = useState("");
+  const [theme, setTheme] = useState("motivational");
+  const [duration, setDuration] = useState("6");
+  const [busy, setBusy] = useState(false);
+  const [loadStep, setLoadStep] = useState("");
+  const [err, setErr] = useState("");
+  const [scenes, setScenes] = useState(null);
+  const steps = ["Analysing your idea…","Writing script…","Building scenes…","Adding narration…","Almost ready…"];
+
+  const generate = async () => {
+    if (!prompt.trim()) { setErr("Describe what your video should be about."); return; }
+    setBusy(true); setErr(""); setScenes(null);
+    let si=0; const iv=setInterval(()=>setLoadStep(steps[si++%steps.length]),1200);
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        const storedKey = localStorage.getItem(API_KEY_S)||"";
+      if(!storedKey){setErr("Please set your API key first.");clearInterval(iv);setBusy(false);setLoadStep("");return;}
+      const res2 = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":storedKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:1000,
+          messages:[{role:"user",content:`Create a short video script for: "${prompt}"\nStyle: ${theme}\nNumber of scenes: ${duration}\n\nReturn ONLY valid JSON, no markdown:\n{"scenes":[{"title":"SHORT TITLE IN CAPS","narration":"1-2 sentence narration."}]}\n\nExactly ${duration} scenes. JSON only.`}]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content?.find(b=>b.type==="text")?.text||"";
+      const clean = raw.replace(/\`\`\`json|\`\`\`/g,"").trim();
+      const parsed = JSON.parse(clean);
+      setScenes(parsed.scenes);
+    } catch(e) {
+      setErr("Could not generate video. Please try again.");
+    } finally {
+      clearInterval(iv); setBusy(false); setLoadStep("");
+    }
+  };
+
+  return (
+    <>
+      <div className="hd">
+        <Logo/>
+        <div className="hd-badge">✓ LIFETIME ACCESS</div>
+      </div>
+      {!scenes ? (
+        <div className="card">
+          <div className="sect-lbl">Your video idea</div>
+          <textarea className="prompt-inp" rows={3} placeholder="e.g. 5 morning habits that will change your life…" value={prompt} onChange={e=>setPrompt(e.target.value)}/>
+          <div className="opt-row">
+            <div>
+              <div className="sect-lbl">Style</div>
+              <select className="sel" value={theme} onChange={e=>setTheme(e.target.value)}>
+                <option value="motivational">💪 Motivational</option>
+                <option value="educational">📚 Educational</option>
+                <option value="news">📰 News Style</option>
+                <option value="funny">😄 Funny</option>
+                <option value="story">📖 Story</option>
+              </select>
+            </div>
+            <div>
+              <div className="sect-lbl">Scenes</div>
+              <select className="sel" value={duration} onChange={e=>setDuration(e.target.value)}>
+                <option value="4">4 scenes (~30s)</option>
+                <option value="6">6 scenes (~45s)</option>
+                <option value="8">8 scenes (~60s)</option>
+              </select>
+            </div>
+          </div>
+          {err && <div className="err">{err}</div>}
+          {busy ? (
+            <div className="loading-stage">
+              <div className="load-ring"/>
+              <div className="load-txt">Generating Video</div>
+              <div className="load-step">{loadStep}</div>
+            </div>
+          ) : (
+            <button className="btn btn-y" onClick={generate}>⚡ GENERATE VIDEO</button>
+          )}
+        </div>
+      ) : (
+        <VideoPlayer scenes={scenes} theme={theme} onReset={()=>setScenes(null)}/>
+      )}
+    </>
+  );
+}
+
+function TrialBanner({ hoursLeft, onPayNow }) {
+  const days=Math.floor(hoursLeft/24), hours=hoursLeft%24;
+  const label=days>0?`${days}d ${hours}h`:`${hours}h`;
+  return (
+    <div style={{background:"#1a1200",border:"1px solid #3a2800",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+      <div>
+        <div style={{fontSize:9,color:"#888",letterSpacing:2,textTransform:"uppercase",marginBottom:2}}>Free Trial</div>
+        <div style={{fontSize:12,color:"#ffaa33"}}><b>{label}</b> remaining</div>
+      </div>
+      <button className="btn btn-y" style={{width:"auto",padding:"8px 14px",fontSize:12,letterSpacing:1}} onClick={onPayNow}>Unlock Full ›</button>
+    </div>
+  );
+}
+
+function App() {
+  const [access, setAccess] = useState(null);
+  const [apiKey, setApiKey] = useState(()=>localStorage.getItem(API_KEY_S)||"");
+  const [showPay, setShowPay] = useState(false);
+
+  useEffect(()=>{ setAccess(getAccess()); },[]);
+
+  const handleUnlock = () => {
+    localStorage.setItem(PAID_KEY,"true");
+    setAccess({status:"paid"});
+    setShowPay(false);
+  };
+
+  if (!access) return null;
+  if (!apiKey) return React.createElement("div", {className:"app"}, React.createElement("div", {className:"wrap"}, React.createElement(Logo), React.createElement(ApiKeyScreen, {onSave:k=>setApiKey(k)})));
+
+  if (access.status==="expired" || showPay) {
+    return (
+      <div className="app"><div className="wrap">
+        <div className="hd"><Logo/></div>
+        {access.status==="expired" && !showPay && (
+          <div style={{background:"#1a0808",border:"1px solid #3a1010",borderRadius:12,padding:20,marginBottom:16,textAlign:"center"}}>
+            <div style={{fontSize:28,marginBottom:8}}>⏰</div>
+            <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#ff6b6b",letterSpacing:1,marginBottom:6}}>Trial Ended</div>
+            <div style={{fontSize:12,color:"#666",marginBottom:16}}>Your 2-day free trial has expired.<br/>Pay once to keep using VIDAI forever.</div>
+            <button className="btn btn-y" onClick={()=>setShowPay(true)}>UNLOCK FOR UGX 5,000 →</button>
+          </div>
+        )}
+        {(showPay || access.status!=="expired") && <PayScreen onUnlock={handleUnlock}/>}
+      </div></div>
+    );
+  }
+
+  return (
+    <div className="app"><div className="wrap">
+      {access.status==="trial" && <TrialBanner hoursLeft={access.hoursLeft} onPayNow={()=>setShowPay(true)}/>}
+      <VideoApp/>
+      <div className="made-by">Made by <span>Yankee</span></div>
+    </div></div>
+  );
+}
+
+ReactDOM.render(<App/>, document.getElementById("root"));
+</script>
+</body>
+</html>
